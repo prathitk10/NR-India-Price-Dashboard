@@ -6,19 +6,13 @@
 <title>India Natural Rubber — Domestic Price Analytics</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg:#0d1117; --surface:#161b22; --surface2:#21262d; --border:#30363d;
-  --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
-  --green:#3fb950; --red:#f85149; --yellow:#e3b341; --orange:#f0883e; --purple:#bc8cff;
-  --rss4:#58a6ff; --rss5:#bc8cff; --isnr:#3fb950; --rma:#e3b341; --goodlot:#ff7b72; --goodlot_rb:#f0883e;
-}
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#e3b341;--orange:#f0883e;--purple:#bc8cff;--rss4:#58a6ff;--rss5:#bc8cff;--isnr:#3fb950;--rma:#e3b341;--goodlot:#ff7b72;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
 .logo{display:flex;align-items:center;gap:12px;}
 .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#58a6ff,#3fb950);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-h1{font-size:17px;font-weight:700;}
-.subtitle{font-size:11px;color:var(--muted);}
+h1{font-size:17px;font-weight:700;}.subtitle{font-size:11px;color:var(--muted);}
 .live-info{text-align:right;font-size:11px;color:var(--muted);}
 .live-badge{display:inline-block;background:#1f3a1f;color:var(--green);border:1px solid #2d5a2d;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;margin-bottom:4px;}
 .live-badge.loading{background:#2a2a1f;color:var(--yellow);border-color:#3a3a2d;}
@@ -34,60 +28,37 @@ h1{font-size:17px;font-weight:700;}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px;margin-bottom:16px;}
 .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden;}
 .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.kpi-card.rss4::before{background:var(--rss4);}
-.kpi-card.rss5::before{background:var(--rss5);}
-.kpi-card.isnr::before{background:var(--isnr);}
-.kpi-card.rma::before{background:var(--rma);}
-.kpi-card.goodlot::before{background:var(--goodlot);}
+.kpi-card.rss4::before{background:var(--rss4);}.kpi-card.rss5::before{background:var(--rss5);}.kpi-card.isnr::before{background:var(--isnr);}.kpi-card.rma::before{background:var(--rma);}.kpi-card.goodlot::before{background:var(--goodlot);}
 .kpi-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-.kpi-value{font-size:26px;font-weight:700;}
-.kpi-unit{font-size:11px;color:var(--muted);}
-.kpi-change{margin-top:5px;font-size:11px;font-weight:500;}
-.up{color:var(--green);} .down{color:var(--red);} .flat{color:var(--muted);}
-.kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.kpi-value{font-size:26px;font-weight:700;}.kpi-unit{font-size:11px;color:var(--muted);}
+.kpi-change{margin-top:5px;font-size:11px;font-weight:500;}.kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.up{color:var(--green);}.down{color:var(--red);}.flat{color:var(--muted);}
 .controls{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
 .ctrl-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;}
 .btn-group{display:flex;gap:3px;}
 .btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 11px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.15s;}
-.btn:hover{border-color:var(--accent);color:var(--accent);}
-.btn.active{background:#1f2d3d;border-color:var(--accent);color:var(--accent);}
+.btn:hover{border-color:var(--accent);color:var(--accent);}.btn.active{background:#1f2d3d;border-color:var(--accent);color:var(--accent);}
 #refresh-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.15s;margin-left:auto;}
 #refresh-btn:hover{border-color:var(--green);color:var(--green);}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
 .panel-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
-.panel-title{font-size:13px;font-weight:700;color:var(--text);}
-.panel-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.panel-title{font-size:13px;font-weight:700;color:var(--text);}.panel-desc{font-size:11px;color:var(--muted);margin-top:2px;}
 .chart-wrap{position:relative;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;}
-@media(max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:700px){.grid2,.grid4{grid-template-columns:1fr;}}
-.info-wrap{position:relative;display:inline-block;}
-.info-btn{background:none;border:1px solid var(--border);color:var(--muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:8px;vertical-align:middle;transition:all 0.15s;}
-.info-btn:hover{border-color:var(--accent);color:var(--accent);}
-.tooltip{display:none;position:absolute;top:26px;right:0;background:#1c2128;border:1px solid var(--border);border-radius:8px;padding:12px 14px;width:280px;font-size:11px;color:var(--muted);line-height:1.6;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
-.tooltip.left{right:auto;left:0;}
-.tooltip h4{color:var(--text);font-size:12px;margin-bottom:6px;}
-.tooltip ul{padding-left:14px;}
-.tooltip li{margin-bottom:3px;}
-.info-wrap:hover .tooltip{display:block;}
+@media(max-width:700px){.grid2{grid-template-columns:1fr;}}
 .spread-table{width:100%;border-collapse:collapse;font-size:12px;}
 .spread-table th{text-align:left;padding:8px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);font-size:10px;text-transform:uppercase;}
 .spread-table td{padding:8px 12px;border-bottom:1px solid var(--border);}
-.spread-table tr:last-child td{border-bottom:none;}
-.spread-table tr:hover td{background:var(--surface2);}
+.spread-table tr:last-child td{border-bottom:none;}.spread-table tr:hover td{background:var(--surface2);}
 .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
-.tag.buy{background:#1f3a1f;color:var(--green);}
-.tag.sell{background:#3a1f1f;color:var(--red);}
-.tag.hold{background:#3a3a1f;color:var(--yellow);}
+.tag.buy{background:#1f3a1f;color:var(--green);}.tag.sell{background:#3a1f1f;color:var(--red);}.tag.hold{background:#3a3a1f;color:var(--yellow);}
 .signals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px;}
 .signal-card{background:var(--surface2);border-radius:8px;padding:12px;text-align:center;}
 .signal-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
-.signal-icon{font-size:20px;margin-bottom:4px;}
-.signal-value{font-size:16px;font-weight:700;margin-bottom:3px;}
+.signal-icon{font-size:20px;margin-bottom:4px;}.signal-value{font-size:16px;font-weight:700;margin-bottom:3px;}
 .signal-text{font-size:10px;font-weight:600;margin-bottom:6px;}
 .signal-inference{font-size:10px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);padding-top:6px;margin-top:2px;text-align:left;}
-.bullish{color:var(--green);} .bearish{color:var(--red);} .neutral{color:var(--yellow);}
+.bullish{color:var(--green);}.bearish{color:var(--red);}.neutral{color:var(--yellow);}
 .summary-box{background:var(--surface2);border-radius:8px;padding:14px 16px;border-left:3px solid var(--accent);}
 .summary-box h4{font-size:12px;color:var(--accent);margin-bottom:8px;font-weight:700;}
 .summary-box p{font-size:12px;color:var(--text);line-height:1.7;}
@@ -111,8 +82,8 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 <div class="panel"><div class="panel-header"><div><div class="panel-title">Good Lot / RMA Lot — Official vs On-Ground (Rs/kg)</div><div class="panel-desc">Rubber Board RMA Lot (official) vs Tripura supplier on-ground rate</div></div></div><div class="chart-wrap" style="height:260px;"><canvas id="goodlotChart"></canvas></div></div>
 <div class="section-head">📊 Spread Analysis</div>
 <div class="grid2">
-  <div class="panel"><div class="panel-header"><div><div class="panel-title">RSS4 over Good Lot Spread</div><div class="panel-desc">RSS4 minus RMA Lot — Rubber Board official prices (Rs/kg)</div></div></div><div class="chart-wrap" style="height:200px;"><canvas id="spread1Chart"></canvas></div></div>
-  <div class="panel"><div class="panel-header"><div><div class="panel-title">RSS4 over RSS5 Spread</div><div class="panel-desc">RSS4 minus RSS5 — Rubber Board official prices (Rs/kg)</div></div></div><div class="chart-wrap" style="height:200px;"><canvas id="spread2Chart"></canvas></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS4 over Good Lot Spread</div><div class="chart-wrap" style="height:200px;"><canvas id="spread1Chart"></canvas></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS4 over RSS5 Spread</div><div class="chart-wrap" style="height:200px;"><canvas id="spread2Chart"></canvas></div></div>
 </div>
 <div class="section-head">📉 Moving Averages — MA7 & MA20</div>
 <div class="grid2">
@@ -125,7 +96,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 </div>
 <div class="section-head">📐 Bollinger Bands (20D, ±2σ)</div>
 <div class="controls" style="margin-bottom:14px;"><span class="ctrl-label">Grade</span><div class="btn-group"><button class="btn active" id="bb-rss4" onclick="setBBGrade('RSS4_RB','RSS4')">RSS4</button><button class="btn" id="bb-rss5" onclick="setBBGrade('RSS5_RB','RSS5')">RSS5</button><button class="btn" id="bb-goodlot" onclick="setBBGrade('RMA_Lot_RB','Good Lot')">Good Lot</button></div></div>
-<div class="panel"><div class="panel-header"><div><div class="panel-title" id="bb-title">RSS4 — Bollinger Bands (20D ±2σ)</div><div class="panel-desc">Middle = MA-20 · Upper/Lower = 2 standard deviations</div></div></div><div class="chart-wrap" style="height:300px;"><canvas id="bollingerChart"></canvas></div></div>
+<div class="panel"><div class="panel-title" id="bb-title" style="margin-bottom:10px;">RSS4 — Bollinger Bands (20D ±2σ)</div><div class="chart-wrap" style="height:300px;"><canvas id="bollingerChart"></canvas></div></div>
 <div class="section-head">⚡ RSI — Relative Strength Index (14-day)</div>
 <div class="grid2">
   <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS4 — RSI 14</div><div class="chart-wrap" style="height:200px;"><canvas id="rsi_rss4"></canvas></div></div>
@@ -154,60 +125,17 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
   <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Good Lot (RB) — YoY (2022–2026)</div><div class="chart-wrap" style="height:220px;"><canvas id="yoy_goodlot"></canvas></div></div>
 </div>
 <div class="section-head">📋 Comparative Statistics</div>
-<div class="panel"><div class="panel-header"><div><div class="panel-title">Key Statistics by Grade</div><div class="panel-desc">Latest price, moving averages, 52-week range, and signal</div></div></div><table class="spread-table" id="stats-table"><thead><tr><th>Grade</th><th>Latest</th><th>1M Avg</th><th>3M Avg</th><th>52W High</th><th>52W Low</th><th>52W Avg</th><th>vs 52W Avg</th><th>MA-20</th><th>vs MA-20</th><th>Signal</th></tr></thead><tbody id="stats-tbody"></tbody></table></div>
+<div class="panel"><table class="spread-table"><thead><tr><th>Grade</th><th>Latest</th><th>1M Avg</th><th>3M Avg</th><th>52W High</th><th>52W Low</th><th>52W Avg</th><th>vs 52W Avg</th><th>MA-20</th><th>vs MA-20</th><th>Signal</th></tr></thead><tbody id="stats-tbody"></tbody></table></div>
 <div class="section-head">🚦 Technical Signals — Current Market State (RSS4)</div>
-<div class="panel"><div class="panel-header"><div><div class="panel-title">Signal Dashboard — Based on RSS4 Rubber Board Price</div><div class="panel-desc">Each indicator shows its current reading, signal, and one-line inference</div></div></div><div class="signals-grid" id="signals-grid"></div><div class="summary-box" id="summary-box"></div></div>
+<div class="panel"><div class="panel-title" style="margin-bottom:12px;">Signal Dashboard — Based on RSS4 Rubber Board Price</div><div class="signals-grid" id="signals-grid"></div><div class="summary-box" id="summary-box"></div></div>
 </div>
 <footer>India Natural Rubber Domestic Price Analytics · Rubber Board India (Official) + Tripura On-Ground Field Rates<br><em>Live data from Google Sheets · Auto-fetches on every page load</em></footer>
 <script>
 const SHEET_ID='1SGql_tkiPOHyRkPztVS_Bg1eHGy_VGbXwOvATlBgtJ0';
-const SHEET_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;const SHEET_URL2='placeholder`;
-function parseCSV(csv){
-  const lines=csv.trim().split('\n');
-  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
-  const rows=[];
-  for(let i=1;i<lines.length;i++){
-    const line=lines[i];if(!line.trim())continue;
-    const vals=[];let inQ=false,cur='';
-    for(let c=0;c<line.length;c++){if(line[c]==='"'){inQ=!inQ;}else if(line[c]===','&&!inQ){vals.push(cur);cur='';}else{cur+=line[c];}}vals.push(cur);
-    const row={};headers.forEach((h,idx)=>{row[h]=(vals[idx]||'').trim();});
-    let ds=((row['Date']||row['date']||'')).replace(/"/g,'').trim();
-    let pd=null;
-    if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){pd=ds;}
-    else if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(ds)){const[d,m,y]=ds.split('/');pd=`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;}
-    else if(/^\d{1,2}-\d{1,2}-\d{4}$/.test(ds)){const[d,m,y]=ds.split('-');pd=`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;}
-    else{const d=new Date(ds);if(!isNaN(d))pd=d.toISOString().split('T')[0];}
-    if(!pd)continue;
-    const pn=(key)=>{const al={'RSS4_RB':['RSS4_RB','RSS4'],'RSS5_RB':['RSS5_RB','RSS5'],'ISNR20_RB':['ISNR20_RB','ISNR-20','ISNR20'],'RMA_Lot_RB':['RMA_Lot_RB','RMA_Lot','RMA Lot'],'GoodLot_TR':['GoodLot_TR','Lot_Local','GoodLot']};const ks=al[key]||[key];for(const k of ks){if(row[k]!==undefined&&row[k]!==''&&row[k]!=='null'){const n=parseFloat(row[k]);if(!isNaN(n))return n;}}return null;};
-    rows.push({date:pd,RSS4_RB:pn('RSS4_RB'),RSS5_RB:pn('RSS5_RB'),ISNR20_RB:pn('ISNR20_RB'),RMA_Lot_RB:pn('RMA_Lot_RB'),GoodLot_TR:pn('GoodLot_TR')});
-  }
-  return rows.sort((a,b)=>a.date.localeCompare(b.date));
-}
+const SHEET_URL='https://corsproxy.io/?url='+encodeURIComponent('https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid=0');
+function parseCSV(csv){const lines=csv.trim().split('\n');const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());const rows=[];for(let i=1;i<lines.length;i++){const line=lines[i];if(!line.trim())continue;const vals=[];let inQ=false,cur='';for(let c=0;c<line.length;c++){if(line[c]==='"'){inQ=!inQ;}else if(line[c]===','&&!inQ){vals.push(cur);cur='';}else{cur+=line[c];}}vals.push(cur);const row={};headers.forEach((h,idx)=>{row[h]=(vals[idx]||'').trim();});let ds=((row['Date']||row['date']||'')).replace(/"/g,'').trim();let pd=null;if(/^\d{4}-\d{2}-\d{2}$/.test(ds)){pd=ds;}else if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(ds)){const[d,m,y]=ds.split('/');pd=`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;}else if(/^\d{1,2}-\d{1,2}-\d{4}$/.test(ds)){const[d,m,y]=ds.split('-');pd=`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;}else{const d=new Date(ds);if(!isNaN(d))pd=d.toISOString().split('T')[0];}if(!pd)continue;const pn=(key)=>{const al={'RSS4_RB':['RSS4_RB','RSS4'],'RSS5_RB':['RSS5_RB','RSS5'],'ISNR20_RB':['ISNR20_RB','ISNR-20','ISNR20'],'RMA_Lot_RB':['RMA_Lot_RB','RMA_Lot','RMA Lot'],'GoodLot_TR':['GoodLot_TR','Lot_Local','GoodLot']};const ks=al[key]||[key];for(const k of ks){if(row[k]!==undefined&&row[k]!==''&&row[k]!=='null'){const n=parseFloat(row[k]);if(!isNaN(n))return n;}}return null;};rows.push({date:pd,RSS4_RB:pn('RSS4_RB'),RSS5_RB:pn('RSS5_RB'),ISNR20_RB:pn('ISNR20_RB'),RMA_Lot_RB:pn('RMA_Lot_RB'),GoodLot_TR:pn('GoodLot_TR')});}return rows.sort((a,b)=>a.date.localeCompare(b.date));}
 let data=[],activeRange=180,bbGrade='RSS4_RB',bbLabel='RSS4',bollingerChart=null;
-async function loadAndRender(){
-  const badge=document.getElementById('live-badge'),updText=document.getElementById('updated-text');
-  badge.className='live-badge loading';badge.textContent='⟳ Loading…';updText.textContent='Fetching from Google Sheets…';
-  document.getElementById('error-banner').style.display='none';
-  try{
-    const resp=await fetch(SHEET_URL+'&t='+Date.now());
-    if(!resp.ok)throw new Error('HTTP '+resp.status);
-    const csv=await resp.text();
-    const parsed=parseCSV(csv);
-    if(parsed.length===0)throw new Error('No data');
-    data=parsed.map(r=>({...r,dateObj:new Date(r.date),dateMs:new Date(r.date).getTime()}));
-    const lastDate=data[data.length-1].date;
-    badge.className='live-badge';badge.textContent='● LIVE';
-    updText.textContent=`Data: ${lastDate} · Loaded: ${new Date().toLocaleTimeString('en-IN')}`;
-    document.getElementById('loading-screen').classList.add('hidden');
-    renderAll();
-  }catch(err){
-    console.error('Fetch error:',err);
-    badge.className='live-badge error';badge.textContent='⚠ Error';
-    updText.textContent='Failed to load — check sheet permissions';
-    document.getElementById('error-banner').style.display='block';
-    document.getElementById('loading-screen').classList.add('hidden');
-  }
-}
+async function loadAndRender(){const badge=document.getElementById('live-badge'),updText=document.getElementById('updated-text');badge.className='live-badge loading';badge.textContent='⟳ Loading…';updText.textContent='Fetching from Google Sheets…';document.getElementById('error-banner').style.display='none';try{const resp=await fetch(SHEET_URL);if(!resp.ok)throw new Error('HTTP '+resp.status);const csv=await resp.text();const parsed=parseCSV(csv);if(parsed.length===0)throw new Error('No data');data=parsed.map(r=>({...r,dateObj:new Date(r.date),dateMs:new Date(r.date).getTime()}));const lastDate=data[data.length-1].date;badge.className='live-badge';badge.textContent='● LIVE';updText.textContent=`Data: ${lastDate} · Loaded: ${new Date().toLocaleTimeString('en-IN')}`;document.getElementById('loading-screen').classList.add('hidden');renderAll();}catch(err){console.error('Fetch error:',err);badge.className='live-badge error';badge.textContent='⚠ Error';updText.textContent='Failed to load — check sheet permissions';document.getElementById('error-banner').style.display='block';document.getElementById('loading-screen').classList.add('hidden');}}
 function calcMA(arr,n){return arr.map((v,i)=>{const sl=arr.slice(Math.max(0,i-n+1),i+1).filter(x=>x!==null&&!isNaN(x));return sl.length>=Math.min(n,5)?sl.reduce((a,b)=>a+b,0)/sl.length:null;});}
 function calcRSI(prices,p=14){const rsi=new Array(prices.length).fill(null);const gains=[],losses=[];for(let i=1;i<prices.length;i++){if(prices[i]===null||prices[i-1]===null){gains.push(null);losses.push(null);continue;}const d=prices[i]-prices[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}for(let i=p-1;i<gains.length;i++){const g=gains.slice(i-p+1,i+1).filter(x=>x!==null);const l=losses.slice(i-p+1,i+1).filter(x=>x!==null);if(!g.length)continue;const avgG=g.reduce((a,b)=>a+b,0)/g.length;const avgL=l.reduce((a,b)=>a+b,0)/l.length;const rs=avgL===0?100:avgG/avgL;rsi[i+1]=100-(100/(1+rs));}return rsi;}
 function calcBollinger(prices,p=20,mult=2){return prices.map((v,i)=>{const sl=prices.slice(Math.max(0,i-p+1),i+1).filter(x=>x!==null);if(sl.length<p)return{mid:null,upper:null,lower:null};const mean=sl.reduce((a,b)=>a+b,0)/sl.length;const std=Math.sqrt(sl.reduce((a,b)=>a+(b-mean)**2,0)/sl.length);return{mid:mean,upper:mean+mult*std,lower:mean-mult*std};});}
@@ -235,14 +163,11 @@ function buildYoYChart(id,priceKey){const years=[2022,2023,2024,2025,2026];const
 function buildAllYoY(){buildYoYChart('yoy_rss4','RSS4_RB');buildYoYChart('yoy_rss5','RSS5_RB');buildYoYChart('yoy_isnr','ISNR20_RB');buildYoYChart('yoy_goodlot','RMA_Lot_RB');}
 function buildKPIs(){const series=[{key:'RSS4_RB',label:'RSS4 (RB)',cls:'rss4'},{key:'RSS5_RB',label:'RSS5 (RB)',cls:'rss5'},{key:'ISNR20_RB',label:'ISNR-20 (RB)',cls:'isnr'},{key:'RMA_Lot_RB',label:'Good Lot (RB)',cls:'rma'},{key:'GoodLot_TR',label:'Good Lot — Tripura',cls:'goodlot'}];document.getElementById('kpi-grid').innerHTML=series.map(s=>{const prices=data.map(r=>r[s.key]).filter(v=>v!==null);const val=prices[prices.length-1];const prev=prices[prices.length-2];const chg=val&&prev?val-prev:null;const pct=chg&&prev?(chg/prev*100):null;const arrow=chg===null?'':chg>0?'▲':chg<0?'▼':'—';const cls=chg===null?'flat':chg>0?'up':chg<0?'down':'flat';const ma20=calcMA(prices,20);const ma20v=ma20[ma20.length-1];const vsMa=val&&ma20v?(val-ma20v):null;return`<div class="kpi-card ${s.cls}"><div class="kpi-label">${s.label}</div><div class="kpi-value">${val?'₹'+val.toFixed(1):'—'} <span class="kpi-unit">Rs/kg</span></div><div class="kpi-change ${cls}">${chg!==null?`${arrow} ${Math.abs(chg).toFixed(2)} (${pct>=0?'+':''}${pct?pct.toFixed(2):'0.00'}%)`:'No change data'}</div><div class="kpi-sub">${vsMa!==null?(vsMa>=0?'▲ above':'▼ below')+' MA-20 by ₹'+Math.abs(vsMa).toFixed(1):'MA-20 N/A'}</div></div>`;}).join('');}
 function buildStats(){const series=[{key:'RSS4_RB',name:'RSS4 (RB)'},{key:'RSS5_RB',name:'RSS5 (RB)'},{key:'ISNR20_RB',name:'ISNR-20 (RB)'},{key:'RMA_Lot_RB',name:'Good Lot (RB)'},{key:'GoodLot_TR',name:'Good Lot — Tripura'}];const now=new Date();const y52=new Date(now);y52.setFullYear(y52.getFullYear()-1);const m1=new Date(now);m1.setMonth(m1.getMonth()-1);const m3=new Date(now);m3.setMonth(m3.getMonth()-3);document.getElementById('stats-tbody').innerHTML=series.map(s=>{const all=data.filter(r=>r[s.key]!==null);if(!all.length)return`<tr><td>${s.name}</td><td colspan="10" style="color:var(--muted)">No data</td></tr>`;const y52d=all.filter(r=>r.dateObj>=y52);const m1d=all.filter(r=>r.dateObj>=m1);const m3d=all.filter(r=>r.dateObj>=m3);const prices=all.map(r=>r[s.key]);const val=prices[prices.length-1];const hi=Math.max(...y52d.map(r=>r[s.key]).filter(v=>v!==null));const lo=Math.min(...y52d.map(r=>r[s.key]).filter(v=>v!==null));const ya=avg(y52d.map(r=>r[s.key]));const m1a=avg(m1d.map(r=>r[s.key]));const m3a=avg(m3d.map(r=>r[s.key]));const ma20=calcMA(prices,20);const lma=ma20[ma20.length-1];const vsya=val&&ya?val-ya:null;const vsma=val&&lma?val-lma:null;const sig=vsma>5?'BUY':vsma<-5?'SELL':'HOLD';const sigc=sig==='BUY'?'buy':sig==='SELL'?'sell':'hold';const f=(v)=>v!==null&&!isNaN(v)?'₹'+v.toFixed(1):'—';const fp=(v)=>v!==null&&!isNaN(v)?(v>=0?'+':'')+v.toFixed(1):'—';return`<tr><td style="font-weight:700;color:var(--text)">${s.name}</td><td style="font-weight:700">${f(val)}</td><td>${f(m1a)}</td><td>${f(m3a)}</td><td style="color:var(--green)">${f(hi)}</td><td style="color:var(--red)">${f(lo)}</td><td>${f(ya)}</td><td class="${vsya>0?'up':vsya<0?'down':'flat'}">${fp(vsya)}</td><td>${f(lma)}</td><td class="${vsma>0?'up':vsma<0?'down':'flat'}">${fp(vsma)}</td><td><span class="tag ${sigc}">${sig}</span></td></tr>`;}).join('');}
-function buildSignals(){const prices=data.filter(r=>r.RSS4_RB!==null).map(r=>r.RSS4_RB);const lastP=last(prices);const ma7=calcMA(prices,7),ma20=calcMA(prices,20),ma50=calcMA(prices,50);const lma7=last(ma7),lma20=last(ma20),lma50=last(ma50);const rsi=calcRSI(prices);const lrsi=last(rsi);const roc=calcROC(prices,30);const lroc=last(roc);const bb=calcBollinger(prices);const lbb=last(bb.filter(b=>b.upper!==null));const prevMA7=ma7.filter(v=>v!==null).slice(-2)[0];const prevMA20=ma20.filter(v=>v!==null).slice(-2)[0];const crossover=prevMA7&&prevMA20&&lma7&&lma20?(lma7>lma20&&prevMA7<=prevMA20?'golden':lma7<lma20&&prevMA7>=prevMA20?'death':lma7>lma20?'above':'below'):'above';const signals=[{label:'RSI-14',icon:lrsi>70?'⚠️':lrsi<30?'💎':'🟡',value:lrsi?lrsi.toFixed(1):'—',trend:lrsi>70?'bearish':lrsi<30?'bullish':'neutral',text:lrsi>70?'OVERBOUGHT':lrsi<30?'OVERSOLD':'NEUTRAL',inference:lrsi>70?'Prices risen too fast. Slow down buying.':lrsi<30?'Prices beaten down. Buying opportunity.':'Momentum balanced. Monitor other indicators.'},{label:'MA Crossover',icon:crossover==='golden'?'🟢':crossover==='death'?'🔴':crossover==='above'?'📈':'📉',value:crossover==='golden'?'Golden Cross':crossover==='death'?'Death Cross':crossover==='above'?'Bullish':'Bearish',trend:crossover==='above'||crossover==='golden'?'bullish':'bearish',text:crossover==='above'||crossover==='golden'?'BULLISH':'BEARISH',inference:crossover==='golden'?'MA7 just crossed above MA20. Fresh bullish signal.':crossover==='death'?'MA7 just crossed below MA20. Fresh bearish signal.':crossover==='above'?'MA7 above MA20, uptrend intact.':'MA7 below MA20, downtrend. Caution.'},{label:'vs MA-20',icon:lastP&&lma20?lastP>lma20?'🔼':'🔽':'➡️',value:lma20?(lastP-lma20).toFixed(2):null,trend:lastP&&lma20?lastP>lma20?'bullish':'bearish':'neutral',text:lastP&&lma20?lastP>lma20?'ABOVE MA20':'BELOW MA20':'N/A',inference:lastP&&lma20?lastP>lma20?'Uptrend healthy — dips toward MA-20 are buy opportunities.':'Downtrend — wait for recovery above MA-20.':'Insufficient data.'},{label:'vs MA-50',icon:lastP&&lma50?lastP>lma50?'🟢':'🔴':'➡️',value:lma50?(lastP-lma50).toFixed(2):null,trend:lastP&&lma50?lastP>lma50?'bullish':'bearish':'neutral',text:lastP&&lma50?lastP>lma50?'ABOVE MA50':'BELOW MA50':'N/A',inference:lastP&&lma50?lastP>lma50?'Price above long-term MA-50. Broader trend bullish.':'Price below MA-50. Long-term trend bearish.':'Insufficient data.'},{label:'30D ROC',icon:lroc>2?'🚀':lroc<-2?'📉':'➡️',value:lroc?(lroc>0?'+':'')+lroc.toFixed(1)+'%':null,trend:lroc>2?'bullish':lroc<-2?'bearish':'neutral',text:lroc>2?'POSITIVE':lroc<-2?'NEGATIVE':'FLAT',inference:lroc>5?'Strong upward momentum. Avoid chasing, wait for pullback.':lroc>0?'Positive momentum. Conditions favour buying.':lroc<-5?'Strong downward momentum. Wait for stabilisation.':'Negative momentum. Cautious stance recommended.'},{label:'Bollinger',icon:lbb?lastP>lbb.upper?'⚡':lastP<lbb.lower?'💎':'✅':'➡️',value:lbb?lastP>lbb.upper?'Near Upper':lastP<lbb.lower?'Near Lower':'Mid Band':'—',trend:lbb?lastP>lbb.upper?'bearish':lastP<lbb.lower?'bullish':'neutral':'neutral',text:lbb?lastP>lbb.upper?'STRETCHED HIGH':lastP<lbb.lower?'STRETCHED LOW':'NORMAL RANGE':'—',inference:lbb?lastP>lbb.upper?'Near upper band — risk of pullback. Confirm with RSI.':lastP<lbb.lower?'Near lower band — buying opportunity. Confirm with RSI.':'Within normal range. MA signals more relevant now.':'Insufficient data.'}];
+function buildSignals(){const prices=data.filter(r=>r.RSS4_RB!==null).map(r=>r.RSS4_RB);const lastP=last(prices);const ma7=calcMA(prices,7),ma20=calcMA(prices,20),ma50=calcMA(prices,50);const lma7=last(ma7),lma20=last(ma20),lma50=last(ma50);const rsi=calcRSI(prices);const lrsi=last(rsi);const roc=calcROC(prices,30);const lroc=last(roc);const bb=calcBollinger(prices);const lbb=last(bb.filter(b=>b.upper!==null));const prevMA7=ma7.filter(v=>v!==null).slice(-2)[0];const prevMA20=ma20.filter(v=>v!==null).slice(-2)[0];const crossover=prevMA7&&prevMA20&&lma7&&lma20?(lma7>lma20&&prevMA7<=prevMA20?'golden':lma7<lma20&&prevMA7>=prevMA20?'death':lma7>lma20?'above':'below'):'above';const signals=[{label:'RSI-14',icon:lrsi>70?'⚠️':lrsi<30?'💎':'🟡',value:lrsi?lrsi.toFixed(1):'—',trend:lrsi>70?'bearish':lrsi<30?'bullish':'neutral',text:lrsi>70?'OVERBOUGHT':lrsi<30?'OVERSOLD':'NEUTRAL',inference:lrsi>70?'Prices risen too fast. Slow down buying.':lrsi<30?'Prices beaten down. Buying opportunity.':'Momentum balanced.'},{label:'MA Crossover',icon:crossover==='golden'?'🟢':crossover==='death'?'🔴':crossover==='above'?'📈':'📉',value:crossover==='golden'?'Golden Cross':crossover==='death'?'Death Cross':crossover==='above'?'Bullish':'Bearish',trend:crossover==='above'||crossover==='golden'?'bullish':'bearish',text:crossover==='above'||crossover==='golden'?'BULLISH':'BEARISH',inference:crossover==='golden'?'MA7 just crossed above MA20. Fresh bullish signal.':crossover==='death'?'MA7 just crossed below MA20. Reduce buying.':crossover==='above'?'Uptrend intact.':'Downtrend. Caution.'},{label:'vs MA-20',icon:lastP&&lma20?lastP>lma20?'🔼':'🔽':'➡️',value:lma20?(lastP-lma20).toFixed(2):null,trend:lastP&&lma20?lastP>lma20?'bullish':'bearish':'neutral',text:lastP&&lma20?lastP>lma20?'ABOVE MA20':'BELOW MA20':'N/A',inference:lastP&&lma20?lastP>lma20?'Uptrend healthy. Dips toward MA-20 are buy opportunities.':'Downtrend. Wait for recovery above MA-20.':'Insufficient data.'},{label:'vs MA-50',icon:lastP&&lma50?lastP>lma50?'🟢':'🔴':'➡️',value:lma50?(lastP-lma50).toFixed(2):null,trend:lastP&&lma50?lastP>lma50?'bullish':'bearish':'neutral',text:lastP&&lma50?lastP>lma50?'ABOVE MA50':'BELOW MA50':'N/A',inference:lastP&&lma50?lastP>lma50?'Broader trend bullish.':'Long-term trend bearish.':'Insufficient data.'},{label:'30D ROC',icon:lroc>2?'🚀':lroc<-2?'📉':'➡️',value:lroc?(lroc>0?'+':'')+lroc.toFixed(1)+'%':null,trend:lroc>2?'bullish':lroc<-2?'bearish':'neutral',text:lroc>2?'POSITIVE':lroc<-2?'NEGATIVE':'FLAT',inference:lroc>5?'Rising fast. Wait for pullback.':lroc>0?'Positive momentum. Favour buying.':lroc<-5?'Falling fast. Wait for stabilisation.':'Declining. Cautious stance.'},{label:'Bollinger',icon:lbb?lastP>lbb.upper?'⚡':lastP<lbb.lower?'💎':'✅':'➡️',value:lbb?lastP>lbb.upper?'Near Upper':lastP<lbb.lower?'Near Lower':'Mid Band':'—',trend:lbb?lastP>lbb.upper?'bearish':lastP<lbb.lower?'bullish':'neutral':'neutral',text:lbb?lastP>lbb.upper?'STRETCHED HIGH':lastP<lbb.lower?'STRETCHED LOW':'NORMAL RANGE':'—',inference:lbb?lastP>lbb.upper?'Near upper band. Risk of pullback.':lastP<lbb.lower?'Near lower band. Buying opportunity.':'Within normal range.':'Insufficient data.'}];
 document.getElementById('signals-grid').innerHTML=signals.map(s=>`<div class="signal-card"><div class="signal-label">${s.label}</div><div class="signal-icon">${s.icon}</div><div class="signal-value ${s.trend}">${s.value||'—'}</div><div class="signal-text ${s.trend}">${s.text}</div><div class="signal-inference">${s.inference}</div></div>`).join('');
-const bullCount=signals.filter(s=>s.trend==='bullish').length;const bearCount=signals.filter(s=>s.trend==='bearish').length;const overall=bullCount>bearCount?'bullish':bearCount>bullCount?'bearish':'mixed';const overallIcon=overall==='bullish'?'📈 BULLISH':overall==='bearish'?'📉 BEARISH':'➡️ MIXED';
-let summary='';
-if(overall==='bullish'){summary=`With ${bullCount} of 6 indicators bullish, the overall signal for RSS4 is <strong style="color:var(--green)">POSITIVE</strong>. Price at ₹${lastP?.toFixed(2)}/kg is above its MA-20 of ₹${lma20?.toFixed(2)}. RSI at ${lrsi?.toFixed(1)} is ${lrsi>70?'overbought — exercise caution':'in neutral range'}. Trading recommendation: <strong>Continue normal buying</strong>${lrsi>65?' but avoid aggressive accumulation':' — conditions favour accumulation'}.`;}
-else if(overall==='bearish'){summary=`With ${bearCount} of 6 indicators bearish, the overall signal for RSS4 is <strong style="color:var(--red)">CAUTIONARY</strong>. Price at ₹${lastP?.toFixed(2)}/kg is near its MA-20 of ₹${lma20?.toFixed(2)}, under downward pressure. RSI at ${lrsi?.toFixed(1)} is ${lrsi<30?'oversold — bounce may be near':'declining'}. Trading recommendation: <strong>Reduce buying, wait for stabilisation</strong>.`;}
-else{summary=`Indicators are split — ${bullCount} bullish, ${bearCount} bearish — giving a <strong style="color:var(--yellow)">MIXED</strong> signal. Price at ₹${lastP?.toFixed(2)}/kg is consolidating around MA-20 of ₹${lma20?.toFixed(2)}. Trading recommendation: <strong>Maintain current pace</strong>, watch for a clearer breakout signal.`;}
-document.getElementById('summary-box').innerHTML=`<h4>🧠 Overall Market Assessment — ${overallIcon} (${bullCount}/${signals.length} indicators bullish)</h4><p>${summary}</p>`;}
+const bullCount=signals.filter(s=>s.trend==='bullish').length;const bearCount=signals.filter(s=>s.trend==='bearish').length;const overall=bullCount>bearCount?'bullish':bearCount>bullCount?'bearish':'mixed';const oi=overall==='bullish'?'📈 BULLISH':overall==='bearish'?'📉 BEARISH':'➡️ MIXED';
+let summary=overall==='bullish'?`With ${bullCount} of 6 indicators bullish, the signal for RSS4 is <strong style="color:var(--green)">POSITIVE</strong>. Price at ₹${lastP?.toFixed(2)}/kg is above its MA-20 of ₹${lma20?.toFixed(2)}. RSI at ${lrsi?.toFixed(1)} is ${lrsi>70?'overbought — exercise caution':'neutral'}. Recommendation: <strong>Continue normal buying</strong>${lrsi>65?' but avoid aggressive accumulation':''}.`:overall==='bearish'?`With ${bearCount} of 6 indicators bearish, the signal for RSS4 is <strong style="color:var(--red)">CAUTIONARY</strong>. Price at ₹${lastP?.toFixed(2)}/kg is near MA-20 of ₹${lma20?.toFixed(2)} under downward pressure. RSI at ${lrsi?.toFixed(1)}. Recommendation: <strong>Reduce buying, wait for stabilisation</strong>.`:`Indicators split — ${bullCount} bullish, ${bearCount} bearish — <strong style="color:var(--yellow)">MIXED</strong> signal. Price at ₹${lastP?.toFixed(2)}/kg consolidating around MA-20 of ₹${lma20?.toFixed(2)}. Recommendation: <strong>Maintain current pace</strong>, watch for clearer breakout.`;
+document.getElementById('summary-box').innerHTML=`<h4>🧠 Overall Market Assessment — ${oi} (${bullCount}/${signals.length} bullish)</h4><p>${summary}</p>`;}
 function buildAll(){const f=filterRange(activeRange);buildMain(f);buildGoodLot(f);buildSpreads(f);buildAllMA(f);buildAllRSI(f);buildAllROC(f);}
 function renderAll(){buildKPIs();buildStats();buildSignals();buildAll();buildBollinger();buildAllYoY();}
 loadAndRender();
