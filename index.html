@@ -161,7 +161,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 <footer>India Natural Rubber Domestic Price Analytics · Rubber Board India (Official) + Tripura On-Ground Field Rates<br><em>Live data from Google Sheets · Auto-fetches on every page load</em></footer>
 <script>
 const SHEET_ID='1SGql_tkiPOHyRkPztVS_Bg1eHGy_VGbXwOvATlBgtJ0';
-const SHEET_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+const SHEET_URL=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;const SHEET_URL2='placeholder`;
 function parseCSV(csv){
   const lines=csv.trim().split('\n');
   const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
