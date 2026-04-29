@@ -142,21 +142,16 @@ const API_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSkr5k1E9KhnwwX
 // ============================================================
 function parseCSV(csvText) {
   const lines = csvText.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim());
+  // Detect delimiter: tab or comma
+  const delim = lines[0].includes('\t') ? '\t' : ',';
+  const headers = lines[0].split(delim).map(h => h.replace(/"/g,'').trim());
   const rows = [];
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     if (!line.trim()) continue;
-    const vals = [];
-    let inQ = false, cur = '';
-    for (let c = 0; c < line.length; c++) {
-      if (line[c] === '"') { inQ = !inQ; }
-      else if (line[c] === ',' && !inQ) { vals.push(cur); cur = ''; }
-      else { cur += line[c]; }
-    }
-    vals.push(cur);
+    const vals = line.split(delim).map(v => v.replace(/"/g,'').trim());
     const row = {};
-    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').replace(/"/g,'').trim(); });
+    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').trim(); });
     rows.push(row);
   }
   return rows;
@@ -188,9 +183,13 @@ function parseRows(jsonRows) {
 
     const pn = (keys) => {
       for (const k of keys) {
-        if (row[k] !== undefined && row[k] !== '' && row[k] !== null) {
-          const n = parseFloat(row[k]);
-          if (!isNaN(n) && n > 0) return n;
+        // Try exact key and trimmed versions
+        const tryKeys = [k, k.trim(), ' '+k, k+' '];
+        for (const tk of tryKeys) {
+          if (row[tk] !== undefined && row[tk] !== '' && row[tk] !== null) {
+            const n = parseFloat(row[tk]);
+            if (!isNaN(n) && n > 0) return n;
+          }
         }
       }
       return null;
@@ -198,11 +197,11 @@ function parseRows(jsonRows) {
 
     rows.push({
       date: parsedDate,
-      RSS4_RB:    pn(['RSS4_RB','RSS4']),
-      RSS5_RB:    pn(['RSS5_RB','RSS5']),
-      ISNR20_RB:  pn(['ISNR20_RB','ISNR-20','ISNR20']),
-      RMA_Lot_RB: pn(['RMA_Lot_RB','RSS Lot_RB','RSS_Lot_RB','RMA_Lot','RMA Lot']),
-      GoodLot_TR: pn(['GoodLot_TR','Lot_Local','GoodLot']),
+      RSS4_RB:    pn(['RSS4_RB']),
+      RSS5_RB:    pn(['RSS5_RB']),
+      ISNR20_RB:  pn(['ISNR20_RB ',' ISNR20_RB','ISNR20_RB']),
+      RMA_Lot_RB: pn(['RSS Lot_RB']),
+      GoodLot_TR: pn(['Lot_Local','RSS Lot_Local','GoodLot_TR']),
     });
   }
   return rows.filter(r => r.date).sort((a,b) => a.date.localeCompare(b.date));
