@@ -135,7 +135,32 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 // ============================================================
 // DATA SOURCE — Google Apps Script Web App (no CORS issues)
 // ============================================================
-const API_URL = 'https://script.google.com/macros/s/AKfycbwr03gmu-OhKrp48ppHNemDrO2oPCgQbMcwFk9uljArZPIr7Bj8dkLOlGm77XQQB9SoEA/exec';
+const API_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSkr5k1E9KhnwwXF-RT1VeRb-NenrffSu0bOVOk2IpXZfbtTM_z5RdypgL87zFIBsI2cfqxnUWqioVN/pub?gid=0&single=true&output=csv';
+
+// ============================================================
+// PARSE CSV TEXT INTO ARRAY OF OBJECTS
+// ============================================================
+function parseCSV(csvText) {
+  const lines = csvText.trim().split('\n');
+  const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+    const vals = [];
+    let inQ = false, cur = '';
+    for (let c = 0; c < line.length; c++) {
+      if (line[c] === '"') { inQ = !inQ; }
+      else if (line[c] === ',' && !inQ) { vals.push(cur); cur = ''; }
+      else { cur += line[c]; }
+    }
+    vals.push(cur);
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').replace(/"/g,'').trim(); });
+    rows.push(row);
+  }
+  return rows;
+}
 
 // ============================================================
 // PARSE JSON FROM APPS SCRIPT
@@ -199,8 +224,9 @@ async function loadAndRender() {
   try {
     const resp = await fetch(API_URL);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const json = await resp.json();
-    if (!Array.isArray(json) || json.length === 0) throw new Error('No data returned');
+    const csvText = await resp.text();
+    const json = parseCSV(csvText);
+    if (!json || json.length === 0) throw new Error('No data returned');
 
     const parsed = parseRows(json);
     if (parsed.length === 0) throw new Error('No valid rows after parsing');
