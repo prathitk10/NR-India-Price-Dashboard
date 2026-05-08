@@ -113,6 +113,19 @@ h1{font-size:17px;font-weight:700;}.subtitle{font-size:11px;color:var(--muted);}
 .signal-tab.active{background:#1f2d3d;border-color:var(--accent);color:var(--accent);}
 
 .section-head{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+
+/* EXPANDABLE CHART MODAL */
+.expand-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.15s;}
+.expand-btn:hover{border-color:var(--accent);color:var(--accent);}
+.chart-wrap{position:relative;}
+#chart-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9000;align-items:center;justify-content:center;padding:24px;}
+#chart-modal.open{display:flex;}
+#chart-modal-inner{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;width:95vw;max-width:1400px;height:80vh;position:relative;display:flex;flex-direction:column;}
+#chart-modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;}
+#chart-modal-canvas-wrap{flex:1;position:relative;}
+#chart-modal-close{position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+#chart-modal-close:hover{border-color:var(--red);color:var(--red);}
+
 footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px;}
 </style>
 </head>
@@ -209,7 +222,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
     <div class="chart-wrap" style="height:200px;"><canvas id="spread3Chart"></canvas></div>
   </div>
   <div class="panel">
-    <div class="panel-title" style="margin-bottom:10px;">Good Lot (RB) over RSS5 (RB)</div>
+    <div class="panel-title" style="margin-bottom:10px;">RSS5 (RB) over Good Lot (RB)</div>
     <div class="chart-wrap" style="height:200px;"><canvas id="spread4Chart"></canvas></div>
   </div>
 </div>
@@ -229,12 +242,12 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
   </div>
 </div>
 <div class="grid2">
-  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS4 — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_rss4"></canvas></div></div>
-  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS5 — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_rss5"></canvas></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS4 — Price + MA7 + MA20 <small style="color:var(--muted);font-size:10px;font-weight:400;">(click ⤢ to expand)</small></div><div class="chart-wrap" style="height:220px;"><canvas id="ma_rss4"></canvas><button class="expand-btn" onclick="expandMA('RSS4_RB','RSS4','#58a6ff')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">RSS5 — Price + MA7 + MA20 <small style="color:var(--muted);font-size:10px;font-weight:400;">(click ⤢ to expand)</small></div><div class="chart-wrap" style="height:220px;"><canvas id="ma_rss5"></canvas><button class="expand-btn" onclick="expandMA('RSS5_RB','RSS5','#bc8cff')">⤢</button></div></div>
 </div>
 <div class="grid2">
-  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">ISNR-20 — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_isnr"></canvas></div></div>
-  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Good Lot (RB) — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_goodlot"></canvas></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">ISNR-20 — Price + MA7 + MA20 <small style="color:var(--muted);font-size:10px;font-weight:400;">(click ⤢ to expand)</small></div><div class="chart-wrap" style="height:220px;"><canvas id="ma_isnr"></canvas><button class="expand-btn" onclick="expandMA('ISNR20_RB','ISNR-20','#3fb950')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Good Lot (RB) — Price + MA7 + MA20 <small style="color:var(--muted);font-size:10px;font-weight:400;">(click ⤢ to expand)</small></div><div class="chart-wrap" style="height:220px;"><canvas id="ma_goodlot"></canvas><button class="expand-btn" onclick="expandMA('RMA_Lot_RB','Good Lot','#e3b341')">⤢</button></div></div>
 </div>
 
 <!-- SECTION 5: BOLLINGER -->
@@ -332,6 +345,15 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
   <div class="summary-box" id="summary-box"></div>
 </div>
 
+
+<!-- EXPANDABLE CHART MODAL -->
+<div id="chart-modal">
+  <div id="chart-modal-inner">
+    <div id="chart-modal-title">Chart</div>
+    <button id="chart-modal-close" onclick="closeModal()">✕</button>
+    <div id="chart-modal-canvas-wrap"><canvas id="chart-modal-canvas"></canvas></div>
+  </div>
+</div>
 </div>
 <footer>India Natural Rubber Domestic Price Analytics · Rubber Board India (Official) + On-Ground Field Rates<br><em>Live data via Cloudflare Worker → Google Sheets · Auto-fetches on load · Refreshes every 30 min</em></footer>
 
@@ -502,8 +524,8 @@ function buildMain(f){
 function buildGoodLot(f){
   const labels=f.map(r=>r.date);
   destroyMake('goodlotChart','line',labels,[
-    {label:'RMA Lot — RB Official',data:f.map(r=>r.RMA_Lot_RB),borderColor:'#e3b341',backgroundColor:'rgba(227,179,65,0.08)',borderWidth:2,pointRadius:0,fill:true,spanGaps:true},
-    {label:'Good Lot — Tripura On-Ground',data:f.map(r=>r.GoodLot_TR),borderColor:'#ff7b72',backgroundColor:'rgba(255,123,114,0.08)',borderWidth:2,pointRadius:2,fill:true,spanGaps:false},
+    {label:'RSS Lot — RB Official',data:f.map(r=>r.RMA_Lot_RB),borderColor:'#e3b341',backgroundColor:'rgba(227,179,65,0.08)',borderWidth:2,pointRadius:0,fill:false,spanGaps:true},
+    {label:'RSS Lot — Local/On-Ground',data:f.map(r=>r.RSSLot_Local),borderColor:'#ff7b72',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:2,fill:false,spanGaps:false},
   ]);
 }
 
@@ -513,22 +535,23 @@ function buildSpreads(f){
   const sp1=f.map(r=>(r.RSS4_RB!==null&&r.RMA_Lot_RB!==null)?+(r.RSS4_RB-r.RMA_Lot_RB).toFixed(2):null);
   const sp2=f.map(r=>(r.RSS4_RB!==null&&r.RSS5_RB!==null)?+(r.RSS4_RB-r.RSS5_RB).toFixed(2):null);
   const sp3=f.map(r=>(r.RSS4_RB!==null&&r.ISNR20_RB!==null)?+(r.RSS4_RB-r.ISNR20_RB).toFixed(2):null);
-  const sp4=f.map(r=>(r.RMA_Lot_RB!==null&&r.RSS5_RB!==null)?+(r.RMA_Lot_RB-r.RSS5_RB).toFixed(2):null);
+  const sp4=f.map(r=>(r.RSS5_RB!==null&&r.RMA_Lot_RB!==null)?+(r.RSS5_RB-r.RMA_Lot_RB).toFixed(2):null);
   destroyMake('spread1Chart','bar',labels,[{label:'RSS4−Good Lot',data:sp1,backgroundColor:bc(sp1),borderRadius:2}],{scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:9},stepSize:5},grid:{color:'#21262d'}}}});
   destroyMake('spread2Chart','bar',labels,[{label:'RSS4−RSS5',data:sp2,backgroundColor:bc(sp2),borderRadius:2}],{scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:9},stepSize:5},grid:{color:'#21262d'}}}});
   destroyMake('spread3Chart','bar',labels,[{label:'RSS4−ISNR20',data:sp3,backgroundColor:bc(sp3),borderRadius:2}],{scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:9},stepSize:5},grid:{color:'#21262d'}}}});
-  destroyMake('spread4Chart','bar',labels,[{label:'Good Lot−RSS5',data:sp4,backgroundColor:bc(sp4),borderRadius:2}],{scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:9},stepSize:5},grid:{color:'#21262d'}}}});
+  destroyMake('spread4Chart','bar',labels,[{label:'RSS5−Good Lot',data:sp4,backgroundColor:bc(sp4),borderRadius:2}],{scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:9},stepSize:5},grid:{color:'#21262d'}}}});
 }
 
 function buildMAChart(id,label,priceKey,f,color){
   const prices=f.map(r=>r[priceKey]);
   const labels=f.map(r=>r.date);
   const ma7=calcMA(prices,7),ma20=calcMA(prices,20);
+  const yOpts={ticks:{color:'#8b949e',font:{size:9},stepSize:5},grid:{color:'#21262d'}};
   destroyMake(id,'line',labels,[
     {label:label,data:prices,borderColor:color,backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
     {label:'MA-7',data:ma7,borderColor:'#f0883e',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,2],pointRadius:0,spanGaps:true},
     {label:'MA-20',data:ma20,borderColor:'#bc8cff',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,3],pointRadius:0,spanGaps:true},
-  ]);
+  ],{scales:{x:CD.scales.x,y:yOpts}});
 }
 function buildAllMA(f){
   buildMAChart('ma_rss4','RSS4','RSS4_RB',f,'#58a6ff');
@@ -768,6 +791,37 @@ function renderAll(){
   buildBollinger();
   buildAllYoY();
 }
+
+
+// ── EXPANDABLE MA MODAL ──────────────────────────────────────
+let modalChart = null;
+function expandMA(priceKey, label, color) {
+  const f = filterRange(activeRange);
+  const prices = f.map(r => r[priceKey]);
+  const labels = f.map(r => r.date);
+  const ma7 = calcMA(prices, 7), ma20 = calcMA(prices, 20);
+  document.getElementById('chart-modal-title').textContent = label + ' — Price + MA7 + MA20 (Expanded View)';
+  document.getElementById('chart-modal').classList.add('open');
+  if (modalChart) modalChart.destroy();
+  const ctx = document.getElementById('chart-modal-canvas').getContext('2d');
+  modalChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [
+      {label:label,data:prices,borderColor:color,backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,spanGaps:true},
+      {label:'MA-7',data:ma7,borderColor:'#f0883e',backgroundColor:'transparent',borderWidth:2,borderDash:[4,2],pointRadius:0,spanGaps:true},
+      {label:'MA-20',data:ma20,borderColor:'#bc8cff',backgroundColor:'transparent',borderWidth:2,borderDash:[6,3],pointRadius:0,spanGaps:true},
+    ]},
+    options:{...CD,scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:10},stepSize:5},grid:{color:'#21262d'}}}}
+  });
+}
+function closeModal() {
+  document.getElementById('chart-modal').classList.remove('open');
+  if (modalChart) { modalChart.destroy(); modalChart = null; }
+}
+// Close on backdrop click
+document.getElementById('chart-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 
 loadAndRender();
 setInterval(loadAndRender, 30*60*1000);
