@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>International Natural Rubber — TSR20 Price Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;--red:#f85149;--yellow:#e3b341;--orange:#f0883e;--purple:#bc8cff;--svr:#58a6ff;--sir:#bc8cff;--str:#3fb950;--smr:#e3b341;--sicom:#ff7b72;--china:#39c5cf;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#58a6ff,#3fb950);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+h1{font-size:17px;font-weight:700;}.subtitle{font-size:11px;color:var(--muted);}
+.live-info{text-align:right;font-size:11px;color:var(--muted);}
+.live-badge{display:inline-block;background:#1f3a1f;color:var(--green);border:1px solid #2d5a2d;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;margin-bottom:4px;}
+.live-badge.loading{background:#2a2a1f;color:var(--yellow);border-color:#3a3a2d;}
+.live-badge.error{background:#3a1f1f;color:var(--red);border-color:#5a2d2d;}
+.main{padding:18px 24px;max-width:1600px;margin:0 auto;}
+#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
+#loading-screen .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#loading-screen p{color:var(--muted);font-size:13px;}
+#loading-screen.hidden{display:none;}
+#error-banner{background:#3a1f1f;border:1px solid #5a2d2d;border-radius:8px;padding:12px 16px;margin:0 0 14px;color:var(--red);font-size:12px;display:none;}
+#error-banner button{background:var(--red);color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:11px;margin-left:10px;}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:10px;margin-bottom:16px;}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi-card.svr::before{background:var(--svr);}.kpi-card.sir::before{background:var(--sir);}.kpi-card.str::before{background:var(--str);}.kpi-card.smr::before{background:var(--smr);}.kpi-card.sicom::before{background:var(--sicom);}
+.kpi-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.kpi-value{font-size:26px;font-weight:700;}.kpi-unit{font-size:11px;color:var(--muted);}
+.kpi-change{margin-top:5px;font-size:11px;font-weight:500;}.kpi-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.up{color:var(--green);}.down{color:var(--red);}.flat{color:var(--muted);}
+
+.controls{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.ctrl-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+.btn-group{display:flex;gap:3px;flex-wrap:wrap;}
+.btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 11px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.15s;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}.btn.active{background:#1f2d3d;border-color:var(--accent);color:var(--accent);}
+#refresh-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:all 0.15s;margin-left:auto;}
+#refresh-btn:hover{border-color:var(--green);color:var(--green);}
+
+.grade-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.grade-chip{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:20px;cursor:pointer;font-size:11px;font-weight:600;transition:all 0.15s;}
+.grade-chip:hover{border-color:var(--accent);color:var(--accent);}
+.grade-chip.active-svr{background:#1f2d3d;border-color:var(--svr);color:var(--svr);}
+.grade-chip.active-sir{background:#2a1f3d;border-color:var(--sir);color:var(--sir);}
+.grade-chip.active-str{background:#1f3a1f;border-color:var(--str);color:var(--str);}
+.grade-chip.active-smr{background:#3a2a1f;border-color:var(--smr);color:var(--smr);}
+.grade-chip.active-sicom{background:#3a1f1f;border-color:var(--sicom);color:var(--sicom);}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
+.panel-title{font-size:13px;font-weight:700;color:var(--text);}.panel-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.chart-wrap{position:relative;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:700px){.grid2{grid-template-columns:1fr;}}
+
+.info-wrap{position:relative;display:inline-block;vertical-align:middle;margin-left:8px;}
+.info-btn{background:none;border:1px solid var(--border);color:var(--muted);width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.info-btn:hover{border-color:var(--accent);color:var(--accent);}
+.tooltip{display:none;position:absolute;top:24px;left:0;background:#1c2128;border:1px solid var(--border);border-radius:8px;padding:12px 14px;width:300px;font-size:11px;color:var(--muted);line-height:1.7;z-index:500;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
+.tooltip h4{color:var(--text);font-size:12px;margin-bottom:8px;font-weight:700;}
+.tooltip ul{padding-left:14px;}.tooltip li{margin-bottom:4px;}.tooltip strong{color:var(--text);}
+.info-wrap:hover .tooltip{display:block;}
+
+.section-head{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--border);margin-top:20px;}
+
+.expand-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.15s;}
+.expand-btn:hover{border-color:var(--accent);color:var(--accent);}
+#chart-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9000;align-items:center;justify-content:center;padding:24px;}
+#chart-modal.open{display:flex;}
+#chart-modal-inner{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;width:95vw;max-width:1400px;height:80vh;position:relative;display:flex;flex-direction:column;}
+#chart-modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;}
+#chart-modal-canvas-wrap{flex:1;position:relative;}
+#chart-modal-close{position:absolute;top:14px;right:14px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+#chart-modal-close:hover{border-color:var(--red);color:var(--red);}
+</style>
+</head>
+<body>
+<div id="loading-screen"><div class="spinner"></div><p>Fetching live international price data…</p></div>
+<header>
+  <div class="logo"><div class="logo-icon">🌍</div><div><h1>International Natural Rubber — TSR20 Price Analytics</h1><div class="subtitle">SVR · SIR · STR · SMR · Sicom Benchmark · USD/100kg</div></div></div>
+  <div class="live-info"><div class="live-badge" id="live-badge">⟳ Loading…</div><div id="updated-text">Connecting…</div><button id="refresh-btn" onclick="loadAndRender()">↻ Refresh</button></div>
+</header>
+
+<div class="main">
+<div id="error-banner">⚠️ Could not load data.<button onclick="loadAndRender()">Retry</button></div>
+
+<!-- KPI CARDS -->
+<div class="section-head">📌 Latest Prices — TSR20 (USD/100kg)</div>
+<div class="kpi-grid" id="kpi-grid"></div>
+
+<!-- GLOBAL PERIOD CONTROL -->
+<div class="controls">
+  <span class="ctrl-label">Chart Period</span>
+  <div class="btn-group" id="range-btns">
+    <button class="btn" onclick="setRange(5)">5D</button>
+    <button class="btn" onclick="setRange(15)">15D</button>
+    <button class="btn" onclick="setRange(30)">1M</button>
+    <button class="btn" onclick="setRange(90)">3M</button>
+    <button class="btn active" onclick="setRange(180)">6M</button>
+    <button class="btn" onclick="setRange(365)">12M</button>
+    <button class="btn" onclick="setRange(730)">24M</button>
+    <button class="btn" onclick="setRange(1095)">36M</button>
+    <button class="btn" onclick="setRange(1825)">60M</button>
+    <button class="btn" onclick="setRange(99999)">All</button>
+  </div>
+</div>
+
+<!-- SECTION 4: INDIVIDUAL ORIGIN -->
+<div class="section-head">📈 Individual Origin — Daily Price
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>Individual Origin Chart</h4><ul>
+      <li>Select an origin chip to view its standalone daily price trend</li>
+      <li>Clean single line lets you focus on one origin's behaviour without visual noise from others</li>
+      <li>Use this to spot origin-specific supply disruptions or demand spikes</li>
+    </ul></div>
+  </div>
+</div>
+<div class="panel">
+  <div class="grade-chips">
+    <button class="grade-chip active-svr" id="chip-svr" onclick="setGrade('SVR','SVR','svr','#58a6ff')">SVR (Vietnam)</button>
+    <button class="grade-chip" id="chip-sir" onclick="setGrade('SIR','SIR','sir','#bc8cff')">SIR (Indonesia)</button>
+    <button class="grade-chip" id="chip-str" onclick="setGrade('STR','STR','str','#3fb950')">STR (Thailand)</button>
+    <button class="grade-chip" id="chip-smr" onclick="setGrade('SMR','SMR','smr','#e3b341')">SMR (Malaysia)</button>
+    <button class="grade-chip" id="chip-sicom" onclick="setGrade('Sicom','Sicom','sicom','#ff7b72')">Sicom (Singapore)</button>
+  </div>
+  <div class="panel-title" id="single-grade-title" style="margin-bottom:4px;">SVR — Daily Price (USD/100kg)</div>
+  <div class="panel-desc" id="single-grade-desc" style="margin-bottom:12px;">Clean price line — use origin chips above to switch</div>
+  <div class="chart-wrap" style="height:300px;"><canvas id="singleGradeChart"></canvas><button class="expand-btn" onclick="expandGeneric('singleGradeChart')">⤢</button></div>
+</div>
+
+<!-- SECTION 5: COMBINED MULTI-ORIGIN -->
+<div class="section-head">📊 Combined Multi-Origin — All Prices (USD/100kg)
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>Combined Chart</h4><ul>
+      <li>All origins overlaid on one chart, each with a distinct colour</li>
+      <li>Use to see relative positioning — which origin trades at a premium or discount</li>
+      <li>Converging lines = price differentiation collapsing across origins</li>
+      <li>Diverging lines = growing dispersion, possibly regional supply issue</li>
+    </ul></div>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-title" style="margin-bottom:4px;">TSR20 — All Origins Combined</div>
+  <div class="panel-desc" style="margin-bottom:12px;">SVR · SIR · STR · SMR · Sicom — daily prices overlaid</div>
+  <div class="chart-wrap" style="height:360px;"><canvas id="mainChart"></canvas><button class="expand-btn" onclick="expandGeneric('mainChart')">⤢</button></div>
+</div>
+
+<!-- SECTION 6: SPREADS OVER SICOM -->
+<div class="section-head">📊 Spread Over Sicom Benchmark
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>Reading Spread Charts</h4><ul>
+      <li><strong>Positive bar (green)</strong> — origin trading above Sicom benchmark (premium)</li>
+      <li><strong>Negative bar (red)</strong> — origin trading below Sicom benchmark (discount)</li>
+      <li><strong>Dotted mean line</strong> — average spread over the selected period; deviations from this line signal unusual pricing</li>
+      <li>Widening premium = origin in high demand / tight supply relative to benchmark</li>
+      <li>Use spreads to identify which origin offers the best relative value to buy</li>
+    </ul></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SVR over Sicom</div><div class="chart-wrap" style="height:200px;"><canvas id="spread_svr"></canvas><button class="expand-btn" onclick="expandGeneric('spread_svr')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SIR over Sicom</div><div class="chart-wrap" style="height:200px;"><canvas id="spread_sir"></canvas><button class="expand-btn" onclick="expandGeneric('spread_sir')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">STR over Sicom</div><div class="chart-wrap" style="height:200px;"><canvas id="spread_str"></canvas><button class="expand-btn" onclick="expandGeneric('spread_str')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SMR over Sicom</div><div class="chart-wrap" style="height:200px;"><canvas id="spread_smr"></canvas><button class="expand-btn" onclick="expandGeneric('spread_smr')">⤢</button></div></div>
+</div>
+
+<!-- SECTION 7: MOVING AVERAGES -->
+<div class="section-head">📉 Moving Averages — MA7 & MA20
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>Moving Average Rules</h4><ul>
+      <li><strong>MA-7</strong> = 7-day average. Reacts quickly to recent moves.</li>
+      <li><strong>MA-20</strong> = 20-day average. Shows medium-term trend.</li>
+      <li><strong>Golden Cross</strong> — MA7 crosses above MA20 → Bullish</li>
+      <li><strong>Death Cross</strong> — MA7 crosses below MA20 → Bearish</li>
+      <li>Price above both MAs → healthy uptrend; below both → downtrend</li>
+      <li>Click ⤢ to expand and inspect crossovers closely</li>
+    </ul></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SVR — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_svr"></canvas><button class="expand-btn" onclick="expandMA('SVR','SVR','#58a6ff')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SIR — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_sir"></canvas><button class="expand-btn" onclick="expandMA('SIR','SIR','#bc8cff')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">STR — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_str"></canvas><button class="expand-btn" onclick="expandMA('STR','STR','#3fb950')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SMR — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_smr"></canvas><button class="expand-btn" onclick="expandMA('SMR','SMR','#e3b341')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Sicom — Price + MA7 + MA20</div><div class="chart-wrap" style="height:220px;"><canvas id="ma_sicom"></canvas><button class="expand-btn" onclick="expandMA('Sicom','Sicom','#ff7b72')">⤢</button></div></div>
+</div>
+
+<!-- SECTION 8: BOLLINGER -->
+<div class="section-head">📐 Bollinger Bands (20D, ±2σ)
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>Bollinger Band Rules</h4><ul>
+      <li><strong>Band Squeeze</strong> → Big move imminent, watch direction</li>
+      <li><strong>Price near upper band</strong> → Stretched high, risk of pullback</li>
+      <li><strong>Price near lower band</strong> → Stretched low, buying opportunity</li>
+      <li>Middle band (MA-20) = support in uptrend, resistance in downtrend</li>
+      <li>Confirm with RSI — lower band + RSI below 30 = strong buy signal</li>
+    </ul></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SVR — Bollinger Bands</div><div class="chart-wrap" style="height:220px;"><canvas id="bb_svr"></canvas><button class="expand-btn" onclick="expandGeneric('bb_svr')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SIR — Bollinger Bands</div><div class="chart-wrap" style="height:220px;"><canvas id="bb_sir"></canvas><button class="expand-btn" onclick="expandGeneric('bb_sir')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">STR — Bollinger Bands</div><div class="chart-wrap" style="height:220px;"><canvas id="bb_str"></canvas><button class="expand-btn" onclick="expandGeneric('bb_str')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SMR — Bollinger Bands</div><div class="chart-wrap" style="height:220px;"><canvas id="bb_smr"></canvas><button class="expand-btn" onclick="expandGeneric('bb_smr')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Sicom — Bollinger Bands</div><div class="chart-wrap" style="height:220px;"><canvas id="bb_sicom"></canvas><button class="expand-btn" onclick="expandGeneric('bb_sicom')">⤢</button></div></div>
+</div>
+
+<!-- SECTION 9: RSI -->
+<div class="section-head">⚡ RSI — Relative Strength Index (14-day)
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>RSI Rules</h4><ul>
+      <li><strong>Above 70 — Overbought</strong> → Correction likely</li>
+      <li><strong>Below 30 — Oversold</strong> → Bounce likely</li>
+      <li>RSI 30–70 = neutral, follow trend direction</li>
+      <li>Combine with Bollinger Bands for stronger confirmation</li>
+    </ul></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SVR — RSI 14</div><div class="chart-wrap" style="height:200px;"><canvas id="rsi_svr"></canvas><button class="expand-btn" onclick="expandGeneric('rsi_svr')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SIR — RSI 14</div><div class="chart-wrap" style="height:200px;"><canvas id="rsi_sir"></canvas><button class="expand-btn" onclick="expandGeneric('rsi_sir')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">STR — RSI 14</div><div class="chart-wrap" style="height:200px;"><canvas id="rsi_str"></canvas><button class="expand-btn" onclick="expandGeneric('rsi_str')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SMR — RSI 14</div><div class="chart-wrap" style="height:200px;"><canvas id="rsi_smr"></canvas><button class="expand-btn" onclick="expandGeneric('rsi_smr')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Sicom — RSI 14</div><div class="chart-wrap" style="height:200px;"><canvas id="rsi_sicom"></canvas><button class="expand-btn" onclick="expandGeneric('rsi_sicom')">⤢</button></div></div>
+</div>
+
+<!-- SECTION 10: ROC -->
+<div class="section-head">🚀 30-Day Rate of Change (ROC)
+  <div class="info-wrap"><button class="info-btn">i</button>
+    <div class="tooltip"><h4>ROC Rules</h4><ul>
+      <li><strong>ROC above zero</strong> → Upward momentum vs 30 days ago</li>
+      <li><strong>ROC below zero</strong> → Downward momentum</li>
+      <li>ROC above +5% → Rising fast, risk of overbought</li>
+      <li>ROC below −5% → Fallen fast, potential buying opportunity</li>
+      <li>Use to confirm MA crossover signals</li>
+    </ul></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SVR — 30D ROC %</div><div class="chart-wrap" style="height:180px;"><canvas id="roc_svr"></canvas><button class="expand-btn" onclick="expandGeneric('roc_svr')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SIR — 30D ROC %</div><div class="chart-wrap" style="height:180px;"><canvas id="roc_sir"></canvas><button class="expand-btn" onclick="expandGeneric('roc_sir')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">STR — 30D ROC %</div><div class="chart-wrap" style="height:180px;"><canvas id="roc_str"></canvas><button class="expand-btn" onclick="expandGeneric('roc_str')">⤢</button></div></div>
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">SMR — 30D ROC %</div><div class="chart-wrap" style="height:180px;"><canvas id="roc_smr"></canvas><button class="expand-btn" onclick="expandGeneric('roc_smr')">⤢</button></div></div>
+</div>
+<div class="grid2">
+  <div class="panel"><div class="panel-title" style="margin-bottom:10px;">Sicom — 30D ROC %</div><div class="chart-wrap" style="height:180px;"><canvas id="roc_sicom"></canvas><button class="expand-btn" onclick="expandGeneric('roc_sicom')">⤢</button></div></div>
+</div>
+
+</div>
+
+<!-- EXPANDABLE MODAL -->
+<div id="chart-modal">
+  <div id="chart-modal-inner">
+    <div id="chart-modal-title">Chart</div>
+    <button id="chart-modal-close" onclick="closeModal()">✕</button>
+    <div id="chart-modal-canvas-wrap"><canvas id="chart-modal-canvas"></canvas></div>
+  </div>
+</div>
+
+<footer>International Natural Rubber Price Analytics · TSR20 · SVR · SIR · STR · SMR · Sicom Benchmark · USD/100kg<br><em>Live data via Cloudflare Worker → Google Sheets · Auto-fetches on load · Refreshes every 30 min</em></footer>
+
+<script>
+const API_URL = 'https://internationalnrpriceanalytics.prathit-ffd.workers.dev/';
+
+// ── CSV PARSER ──────────────────────────────────────────────
+function parseCSV(csvText) {
+  const lines = csvText.trim().split('\n');
+  const delim = lines[0].includes('\t') ? '\t' : ',';
+  const headers = lines[0].split(delim).map(h => h.replace(/"/g,'').trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
+    const vals = line.split(delim).map(v => v.replace(/"/g,'').trim());
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').trim(); });
+    rows.push(row);
+  }
+  return rows;
+}
+
+// ── ROW PARSER ──────────────────────────────────────────────
+function parseRows(jsonRows) {
+  const rows = [];
+  for (const row of jsonRows) {
+    let dateStr = String(row['DATE (YYYY-MM-DD)'] || row['Date (YYYY-MM-DD)'] || row['Date'] || row['date'] || '').trim();
+    let parsedDate = null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) { parsedDate = dateStr; }
+    else if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) { const[d,m,y]=dateStr.split('/');parsedDate=`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`; }
+    else { const d=new Date(dateStr);if(!isNaN(d))parsedDate=d.toISOString().split('T')[0]; }
+    if (!parsedDate || parsedDate==='NaN-NaN-NaN') continue;
+
+    const pn = (keys) => {
+      for (const k of keys) {
+        const tryKeys=[k,k.trim()];
+        for (const tk of tryKeys) {
+          if (row[tk] !== undefined && row[tk] !== '' && row[tk] !== null && row[tk].toUpperCase() !== 'NA') {
+            const n = parseFloat(row[tk]);
+            if (!isNaN(n) && n > 0 && n < 1000) return n;
+          }
+        }
+      }
+      return null;
+    };
+
+    rows.push({
+      date: parsedDate,
+      SVR: pn(['SVR']),
+      SIR: pn(['SIR']),
+      STR: pn(['STR']),
+      SMR: pn(['SMR']),
+      Sicom: pn(['Sicom','SICOM']),
+      China: pn(['China']),
+    });
+  }
+  return rows.filter(r=>r.date).sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+// ── STATE ────────────────────────────────────────────────────
+let data=[], activeRange=180;
+let singleGradeKey='SVR', singleGradeLabel='SVR', singleGradeColor='#58a6ff';
+const charts={};
+let modalChart=null;
+
+// ── FETCH ────────────────────────────────────────────────────
+async function loadAndRender() {
+  const badge=document.getElementById('live-badge'), updText=document.getElementById('updated-text');
+  badge.className='live-badge loading'; badge.textContent='⟳ Loading…';
+  updText.textContent='Fetching from Google Sheets…';
+  document.getElementById('error-banner').style.display='none';
+  try {
+    const resp = await fetch(API_URL);
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    const csvText = await resp.text();
+    const json = parseCSV(csvText);
+    if (!json||json.length===0) throw new Error('No data');
+    const parsed = parseRows(json);
+    if (parsed.length===0) throw new Error('No valid rows');
+    data = parsed.map(r=>({...r, dateObj:new Date(r.date), dateMs:new Date(r.date).getTime()}));
+    const lastDate=data[data.length-1].date;
+    badge.className='live-badge'; badge.textContent='● LIVE';
+    updText.textContent=`Data: ${lastDate} · Loaded: ${new Date().toLocaleTimeString('en-IN')}`;
+    document.getElementById('loading-screen').classList.add('hidden');
+    renderAll();
+  } catch(err) {
+    console.error('Fetch error:',err);
+    badge.className='live-badge error'; badge.textContent='⚠ Error';
+    updText.textContent='Failed to load data';
+    document.getElementById('error-banner').style.display='block';
+    document.getElementById('loading-screen').classList.add('hidden');
+  }
+}
+
+// ── MATH ─────────────────────────────────────────────────────
+function calcMA(arr,n){return arr.map((v,i)=>{const sl=arr.slice(Math.max(0,i-n+1),i+1).filter(x=>x!==null&&!isNaN(x));return sl.length>=Math.min(n,5)?sl.reduce((a,b)=>a+b,0)/sl.length:null;});}
+function calcRSI(prices,p=14){const rsi=new Array(prices.length).fill(null);const gains=[],losses=[];for(let i=1;i<prices.length;i++){if(prices[i]===null||prices[i-1]===null){gains.push(null);losses.push(null);continue;}const d=prices[i]-prices[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}for(let i=p-1;i<gains.length;i++){const g=gains.slice(i-p+1,i+1).filter(x=>x!==null);const l=losses.slice(i-p+1,i+1).filter(x=>x!==null);if(!g.length)continue;const avgG=g.reduce((a,b)=>a+b,0)/g.length;const avgL=l.reduce((a,b)=>a+b,0)/l.length;const rs=avgL===0?100:avgG/avgL;rsi[i+1]=100-(100/(1+rs));}return rsi;}
+function calcBollinger(prices,p=20,mult=2){return prices.map((v,i)=>{const sl=prices.slice(Math.max(0,i-p+1),i+1).filter(x=>x!==null);if(sl.length<p)return{mid:null,upper:null,lower:null};const mean=sl.reduce((a,b)=>a+b,0)/sl.length;const std=Math.sqrt(sl.reduce((a,b)=>a+(b-mean)**2,0)/sl.length);return{mid:mean,upper:mean+mult*std,lower:mean-mult*std};});}
+function calcROC(prices,p=30){return prices.map((v,i)=>{if(i<p||v===null||prices[i-p]===null)return null;return((v-prices[i-p])/prices[i-p])*100;});}
+function avg(arr){const v=arr.filter(x=>x!==null);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;}
+function last(arr){const v=arr.filter(x=>x!==null);return v.length?v[v.length-1]:null;}
+function filterRange(days){const cut=new Date();cut.setDate(cut.getDate()-days);return days>=99999?data:data.filter(r=>r.dateObj>=cut);}
+
+// ── CHART DEFAULTS ───────────────────────────────────────────
+const CD={responsive:true,maintainAspectRatio:false,animation:{duration:250},interaction:{mode:'index',intersect:false},
+  plugins:{legend:{labels:{color:'#8b949e',font:{size:10},boxWidth:10,padding:8}},tooltip:{backgroundColor:'#161b22',titleColor:'#e6edf3',bodyColor:'#8b949e',borderColor:'#30363d',borderWidth:1,padding:8}},
+  scales:{x:{ticks:{color:'#8b949e',font:{size:9},maxTicksLimit:10},grid:{color:'#21262d'}},y:{ticks:{color:'#8b949e',font:{size:9}},grid:{color:'#21262d'}}}};
+
+function makeChart(id,type,labels,datasets,opts={}){
+  const ctx=document.getElementById(id).getContext('2d');
+  const mergedScales={x:{...CD.scales.x,...((opts.scales||{}).x||{})},y:{...CD.scales.y,...((opts.scales||{}).y||{})}};
+  return new Chart(ctx,{type,data:{labels,datasets},options:{...CD,...opts,plugins:{...CD.plugins,...(opts.plugins||{})},scales:mergedScales}});
+}
+function destroyMake(id,type,labels,datasets,opts={}){if(charts[id])charts[id].destroy();charts[id]={chart:makeChart(id,type,labels,datasets,opts),type,labels,datasets,opts};return charts[id].chart;}
+
+// ── CONTROLS ─────────────────────────────────────────────────
+function setRange(days){
+  activeRange=days;
+  document.querySelectorAll('#range-btns .btn').forEach(b=>{b.classList.remove('active');if(b.onclick&&b.onclick.toString().includes(`(${days})`))b.classList.add('active');});
+  buildAll();
+}
+function setGrade(key,label,cls,color){
+  singleGradeKey=key; singleGradeLabel=label; singleGradeColor=color;
+  document.querySelectorAll('.grade-chip').forEach(c=>c.className='grade-chip');
+  document.getElementById('chip-'+cls).className=`grade-chip active-${cls}`;
+  document.getElementById('single-grade-title').textContent=`${label} — Daily Price (USD/100kg)`;
+  buildSingleGrade(filterRange(activeRange));
+}
+
+// ── CHARTS ───────────────────────────────────────────────────
+function buildSingleGrade(f){
+  const prices=f.map(r=>r[singleGradeKey]);
+  const labels=f.map(r=>r.date);
+  destroyMake('singleGradeChart','line',labels,[
+    {label:singleGradeLabel,data:prices,borderColor:singleGradeColor,backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,spanGaps:true}
+  ]);
+}
+
+function buildMain(f){
+  const labels=f.map(r=>r.date);
+  destroyMake('mainChart','line',labels,[
+    {label:'SVR',data:f.map(r=>r.SVR),borderColor:'#58a6ff',backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+    {label:'SIR',data:f.map(r=>r.SIR),borderColor:'#bc8cff',backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+    {label:'STR',data:f.map(r=>r.STR),borderColor:'#3fb950',backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+    {label:'SMR',data:f.map(r=>r.SMR),borderColor:'#e3b341',backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+    {label:'Sicom',data:f.map(r=>r.Sicom),borderColor:'#ff7b72',backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+  ]);
+}
+
+function buildSpreadChart(id,label,priceKey,f){
+  const labels=f.map(r=>r.date);
+  const spreads=f.map(r=>(r[priceKey]!==null&&r.Sicom!==null)?+(r[priceKey]-r.Sicom).toFixed(2):null);
+  const bc=spreads.map(v=>v===null?'transparent':v>=0?'rgba(63,185,80,0.7)':'rgba(248,81,73,0.7)');
+  const meanVal = avg(spreads);
+  const meanLine = new Array(spreads.length).fill(meanVal);
+  destroyMake(id,'bar',labels,[
+    {label:label+' − Sicom',data:spreads,backgroundColor:bc,borderRadius:2,type:'bar'},
+    {label:'Mean Spread',data:meanLine,type:'line',borderColor:'rgba(255,255,255,0.5)',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false},
+  ]);
+}
+function buildAllSpreads(f){
+  buildSpreadChart('spread_svr','SVR','SVR',f);
+  buildSpreadChart('spread_sir','SIR','SIR',f);
+  buildSpreadChart('spread_str','STR','STR',f);
+  buildSpreadChart('spread_smr','SMR','SMR',f);
+}
+
+function buildMAChart(id,label,priceKey,f,color){
+  const prices=f.map(r=>r[priceKey]);
+  const labels=f.map(r=>r.date);
+  const ma7=calcMA(prices,7),ma20=calcMA(prices,20);
+  destroyMake(id,'line',labels,[
+    {label:label,data:prices,borderColor:color,backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+    {label:'MA-7',data:ma7,borderColor:'#f0883e',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,2],pointRadius:0,spanGaps:true},
+    {label:'MA-20',data:ma20,borderColor:'#bc8cff',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,3],pointRadius:0,spanGaps:true},
+  ]);
+}
+function buildAllMA(f){
+  buildMAChart('ma_svr','SVR','SVR',f,'#58a6ff');
+  buildMAChart('ma_sir','SIR','SIR',f,'#bc8cff');
+  buildMAChart('ma_str','STR','STR',f,'#3fb950');
+  buildMAChart('ma_smr','SMR','SMR',f,'#e3b341');
+  buildMAChart('ma_sicom','Sicom','Sicom',f,'#ff7b72');
+}
+
+function buildBollingerChart(id,label,priceKey,f,color){
+  const prices=f.map(r=>r[priceKey]);
+  const labels=f.map(r=>r.date);
+  const bb=calcBollinger(prices);
+  destroyMake(id,'line',labels,[
+    {label:'Upper Band',data:bb.map(b=>b.upper),borderColor:'rgba(248,81,73,0.5)',backgroundColor:'rgba(248,81,73,0.05)',borderWidth:1,pointRadius:0,fill:'+1',spanGaps:true},
+    {label:'MA-20 (Mid)',data:bb.map(b=>b.mid),borderColor:'#bc8cff',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,spanGaps:true},
+    {label:'Lower Band',data:bb.map(b=>b.lower),borderColor:'rgba(63,185,80,0.5)',backgroundColor:'rgba(63,185,80,0.05)',borderWidth:1,pointRadius:0,spanGaps:true},
+    {label:label,data:prices,borderColor:color,backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+  ]);
+}
+function buildAllBollinger(f){
+  buildBollingerChart('bb_svr','SVR','SVR',f,'#58a6ff');
+  buildBollingerChart('bb_sir','SIR','SIR',f,'#bc8cff');
+  buildBollingerChart('bb_str','STR','STR',f,'#3fb950');
+  buildBollingerChart('bb_smr','SMR','SMR',f,'#e3b341');
+  buildBollingerChart('bb_sicom','Sicom','Sicom',f,'#ff7b72');
+}
+
+function buildRSIChart(id,priceKey,f){
+  const prices=f.map(r=>r[priceKey]);
+  const labels=f.map(r=>r.date);
+  const rsi=calcRSI(prices);
+  const ob=new Array(rsi.length).fill(70),os=new Array(rsi.length).fill(30);
+  destroyMake(id,'line',labels,[
+    {label:'RSI-14',data:rsi,borderColor:'#f0883e',backgroundColor:'transparent',borderWidth:2,pointRadius:0,spanGaps:true},
+    {label:'OB (70)',data:ob,borderColor:'rgba(248,81,73,0.4)',backgroundColor:'transparent',borderWidth:1,borderDash:[4,2],pointRadius:0},
+    {label:'OS (30)',data:os,borderColor:'rgba(63,185,80,0.4)',backgroundColor:'transparent',borderWidth:1,borderDash:[4,2],pointRadius:0},
+  ],{scales:{x:CD.scales.x,y:{ticks:{color:'#8b949e',font:{size:9}},grid:{color:'#21262d'},min:0,max:100}}});
+}
+function buildAllRSI(f){
+  buildRSIChart('rsi_svr','SVR',f);
+  buildRSIChart('rsi_sir','SIR',f);
+  buildRSIChart('rsi_str','STR',f);
+  buildRSIChart('rsi_smr','SMR',f);
+  buildRSIChart('rsi_sicom','Sicom',f);
+}
+
+function buildROCChart(id,priceKey,f){
+  const prices=f.map(r=>r[priceKey]);
+  const labels=f.map(r=>r.date);
+  const roc=calcROC(prices);
+  const zero=new Array(roc.length).fill(0);
+  destroyMake(id,'line',labels,[
+    {label:'30D ROC %',data:roc,borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,0.1)',borderWidth:2,pointRadius:0,fill:'origin',spanGaps:true},
+    {label:'Zero',data:zero,borderColor:'rgba(139,148,158,0.3)',backgroundColor:'transparent',borderWidth:1,pointRadius:0},
+  ]);
+}
+function buildAllROC(f){
+  buildROCChart('roc_svr','SVR',f);
+  buildROCChart('roc_sir','SIR',f);
+  buildROCChart('roc_str','STR',f);
+  buildROCChart('roc_smr','SMR',f);
+  buildROCChart('roc_sicom','Sicom',f);
+}
+
+// ── KPI CARDS ────────────────────────────────────────────────
+function buildKPIs(){
+  const series=[
+    {key:'SVR',label:'SVR (Vietnam)',cls:'svr'},
+    {key:'SIR',label:'SIR (Indonesia)',cls:'sir'},
+    {key:'STR',label:'STR (Thailand)',cls:'str'},
+    {key:'SMR',label:'SMR (Malaysia)',cls:'smr'},
+    {key:'Sicom',label:'Sicom (Origin & Benchmark)',cls:'sicom'},
+  ];
+  document.getElementById('kpi-grid').innerHTML=series.map(s=>{
+    const prices=data.map(r=>r[s.key]).filter(v=>v!==null);
+    const val=prices[prices.length-1];
+    const prev=prices[prices.length-2];
+    const chg=val&&prev?val-prev:null;
+    const pct=chg&&prev?(chg/prev*100):null;
+    const arrow=chg===null?'':chg>0?'▲':chg<0?'▼':'—';
+    const cls=chg===null?'flat':chg>0?'up':chg<0?'down':'flat';
+    const ma20=calcMA(prices,20);const ma20v=ma20[ma20.length-1];
+    const vsMa=val&&ma20v?(val-ma20v):null;
+    return`<div class="kpi-card ${s.cls}">
+      <div class="kpi-label">${s.label}</div>
+      <div class="kpi-value">$${val?val.toFixed(2):'—'} <span class="kpi-unit">/100kg</span></div>
+      <div class="kpi-change ${cls}">${chg!==null?`${arrow} ${Math.abs(chg).toFixed(2)} (${pct>=0?'+':''}${pct?pct.toFixed(2):'0.00'}%)`:'No prior data'}</div>
+      <div class="kpi-sub">${vsMa!==null?(vsMa>=0?'▲ above':'▼ below')+' MA-20 by $'+Math.abs(vsMa).toFixed(2):'MA-20 N/A'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── EXPANDABLE MODAL ─────────────────────────────────────────
+function expandGeneric(chartId) {
+  const c = charts[chartId];
+  if (!c) return;
+  document.getElementById('chart-modal-title').textContent = document.getElementById(chartId).closest('.panel').querySelector('.panel-title').textContent + ' (Expanded View)';
+  document.getElementById('chart-modal').classList.add('open');
+  if (modalChart) modalChart.destroy();
+  const ctx = document.getElementById('chart-modal-canvas').getContext('2d');
+  modalChart = new Chart(ctx, {
+    type: c.type,
+    data: { labels: c.labels, datasets: c.datasets.map(d=>({...d, borderWidth:(d.borderWidth||2)+0.5})) },
+    options: {...CD, ...c.opts, plugins:{...CD.plugins,...(c.opts.plugins||{})}, scales:{x:{...CD.scales.x,...((c.opts.scales||{}).x||{})},y:{...CD.scales.y,...((c.opts.scales||{}).y||{})}}}
+  });
+}
+function expandMA(priceKey, label, color) {
+  const f = filterRange(activeRange);
+  const prices = f.map(r => r[priceKey]);
+  const labels = f.map(r => r.date);
+  const ma7 = calcMA(prices, 7), ma20 = calcMA(prices, 20);
+  document.getElementById('chart-modal-title').textContent = label + ' — Price + MA7 + MA20 (Expanded View)';
+  document.getElementById('chart-modal').classList.add('open');
+  if (modalChart) modalChart.destroy();
+  const ctx = document.getElementById('chart-modal-canvas').getContext('2d');
+  modalChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [
+      {label:label,data:prices,borderColor:color,backgroundColor:'transparent',borderWidth:2.5,pointRadius:0,spanGaps:true},
+      {label:'MA-7',data:ma7,borderColor:'#f0883e',backgroundColor:'transparent',borderWidth:2,borderDash:[4,2],pointRadius:0,spanGaps:true},
+      {label:'MA-20',data:ma20,borderColor:'#bc8cff',backgroundColor:'transparent',borderWidth:2,borderDash:[6,3],pointRadius:0,spanGaps:true},
+    ]},
+    options:{...CD,scales:{x:CD.scales.x,y:CD.scales.y}}
+  });
+}
+function closeModal() {
+  document.getElementById('chart-modal').classList.remove('open');
+  if (modalChart) { modalChart.destroy(); modalChart = null; }
+}
+document.getElementById('chart-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── RENDER ALL ───────────────────────────────────────────────
+function buildAll(){
+  const f=filterRange(activeRange);
+  buildSingleGrade(f);
+  buildMain(f);
+  buildAllSpreads(f);
+  buildAllMA(f);
+  buildAllBollinger(f);
+  buildAllRSI(f);
+  buildAllROC(f);
+}
+function renderAll(){
+  buildKPIs();
+  buildAll();
+}
+
+loadAndRender();
+setInterval(loadAndRender, 30*60*1000);
+</script>
+</body>
+</html>
